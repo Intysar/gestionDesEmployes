@@ -72,10 +72,9 @@ public class EmployeeView extends JFrame{
          		}
         	}
         	
-        }) ;
+        });
 
-		
-		setVisible(true);
+		//setVisible(true);
 	}
 
 	public int getId() {
@@ -117,7 +116,4 @@ public class EmployeeView extends JFrame{
         JOptionPane.showMessageDialog(this, message, "Succes", JOptionPane.INFORMATION_MESSAGE);
     }
 
-	public static void main(String[] args) {
-		new EmployeeView();
-	}
 }

@@ -3,6 +3,7 @@ import DAO.HolidayDAOImpl;
 import Model.Holiday.HolidayType;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class HolidayModel {
@@ -13,32 +14,45 @@ public class HolidayModel {
         this.dao = dao;
     }
 
-    public boolean ajouterHoliday(int id, Date startDate, Date endDate, HolidayType holidayType, int employeeId, Employee employee) {
+    public boolean ajouterHoliday(int id, Date startDate, Date endDate, HolidayType holidayType, int employeeId) {
 
-        if (startDate.after(endDate)) {
-        	System.out.println("Date invalide!");
+        // Validate that start date is not after the end date
+        if (!isValidDateRange(startDate, endDate)) {
+            System.out.println("The start date must be before or equal to the end date.");
             return false;
         }
 
-        Date currentDate = new Date();
-        if (startDate.after(currentDate) || endDate.after(currentDate)) {
-        	System.out.println("Date invalide!");
+        // Calculate the number of holiday days
+        long days = calculateHolidayDays(startDate, endDate);
+        System.out.println(days + " day(s)");
+
+        // Check if the employee has enough holiday balance (optional)
+        // Uncomment this part if you need to check the balance before allowing the holiday
+        /*
+        if (days > employee.getSolde()) {
+            System.out.println("Not enough holiday balance!");
             return false;
         }
+        */
 
-        long diffInMillis = endDate.getTime() - startDate.getTime(); 
-        long days = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS); 
+        // Create and save the holiday
+        Holiday newHoliday = new Holiday(id, startDate, endDate, holidayType, employeeId);
+        dao.ajouter(newHoliday);
 
-        System.out.println(days+" jour(s)");
-
-        if (days>employee.getSolde()) {
-        	System.out.println("Date invalide!");
-        	return false;
-        }
-        
-        Holiday newHoliday=new Holiday(id, startDate, endDate, holidayType, employeeId);
-        dao.ajouterHoliday(newHoliday);
-        
         return true;
+    }
+
+    private boolean isValidDateRange(Date startDate, Date endDate) {
+        return !startDate.after(endDate);  // Ensure startDate is before or equal to endDate
+    }
+
+    private long calculateHolidayDays(Date startDate, Date endDate) {
+        long diffInMillis = endDate.getTime() - startDate.getTime();
+        return TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
+    }
+    
+    public List<Holiday> afficherHolidays(){
+    	
+    	return dao.afficher();    	
     }
 }

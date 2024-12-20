@@ -10,6 +10,26 @@ import java.util.List;
 
 public class EmployeeDAOImpl implements EmployeeDAOI{
 	
+	public List<Employee> getAllEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        try (Connection connection = DBConnection.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id, nom, prenom FROM employe")) {
+
+            while (rs.next()) {
+                Employee employee = new Employee(0, null, null, null, null, 0, null, null, 0);
+                employee.setId(rs.getInt("id"));
+                employee.setNom(rs.getString("nom"));
+                employee.setPrenom(rs.getString("prenom"));
+                employees.add(employee);
+            }
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+	
 	@Override
 	public void ajouterEmployee(Employee employee) {
 		
