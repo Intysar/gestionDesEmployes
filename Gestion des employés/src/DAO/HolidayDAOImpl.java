@@ -10,32 +10,6 @@ import Model.Holiday;
 import Model.Holiday.HolidayType;
 
 public class HolidayDAOImpl implements GenericDAOI<Holiday> {
-
-	
-	public List<Employee> getAllEmployees() {
-        List<Employee> employees = new ArrayList<>();
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            connection = DBConnection.getConnection();
-            String query = "SELECT id, nom, prenom FROM employe";
-            stmt = connection.prepareStatement(query);
-            rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                Employee emp = new Employee(0, query, query, query, query, 0, null, null, 0);
-                emp.setId(rs.getInt("id"));
-                emp.setNom(rs.getString("nom"));
-                emp.setPrenom(rs.getString("prenom"));
-                employees.add(emp);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } 
-        return employees;
-    }
 	
     @Override
     public void ajouter(Holiday holiday) {
@@ -45,7 +19,11 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
 
         try {
             connection = DBConnection.getConnection();
-            
+            int employeeId = getEmployeeIdByName(holiday.getEmployeeNom());
+            if (employeeId == -1) {
+                System.out.println("Erreur : Employe introuvable.");
+                return;
+            }
             String queryDays = "select datediff(?, ?) as days_diff";
             stmt = connection.prepareStatement(queryDays);
             stmt.setDate(1, new java.sql.Date(holiday.getEndDate().getTime()));
@@ -59,7 +37,7 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
 
             String querySolde = "select solde from employe where id=?";
             stmt = connection.prepareStatement(querySolde);
-            stmt.setInt(1, holiday.getEmployeeId());
+            stmt.setInt(1, employeeId);
             rs = stmt.executeQuery();
 
             int solde = 0;
@@ -78,7 +56,7 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
                 stmt.setDate(1, sqlStartDate);
                 stmt.setDate(2, sqlEndDate);
                 stmt.setString(3, holiday.getHolidayType().name());
-                stmt.setInt(4, holiday.getEmployeeId());
+                stmt.setInt(4, employeeId);
 
                 int rowAffected = stmt.executeUpdate();
                 
@@ -86,7 +64,7 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
                     String updateSoldeQuery = "update employe set solde=solde-? where id=?";
                     PreparedStatement updateStmt = connection.prepareStatement(updateSoldeQuery);
                     updateStmt.setInt(1, daysDiff);
-                    updateStmt.setInt(2, holiday.getEmployeeId());
+                    updateStmt.setInt(2, employeeId);
                     updateStmt.executeUpdate();
                     
                     System.out.println("Insertion reussi :)");
@@ -99,11 +77,8 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
-            try { if (rs != null) rs.close(); } catch (SQLException e) {}
-            try { if (stmt != null) stmt.close(); } catch (SQLException e) {}
-            try { if (connection != null) connection.close(); } catch (SQLException e) {}
         }
+        
     }
     
     public List<Holiday> afficher(){
@@ -151,5 +126,160 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
     	}
     	
     	return holidays;
+    }
+    
+    public boolean modifier(Holiday holiday) {
+        String sql = "UPDATE holiday SET startDate = ?, endDate = ?, holidayTypeId = (select id from holidaytype where nom=?) WHERE id = ?";
+        try (PreparedStatement stmt = DBConnection.getConnection().prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(holiday.getStartDate().getTime()));
+            stmt.setDate(2, new java.sql.Date(holiday.getEndDate().getTime()));
+            stmt.setString(3, holiday.getHolidayType().name());
+            stmt.setInt(4, holiday.getId());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    
+    /*public void modifier(int holidayId, Holiday modifiedHoliday) {
+        Connection connection = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            connection = DBConnection.getConnection();
+            
+            int employeeId = getEmployeeIdByName(modifiedHoliday.getEmployeeNom());
+            if (employeeId == -1) {
+                System.out.println("Erreur : Employé introuvable.");
+                return;
+            }
+
+            String queryDays = "select datediff(?, ?) as days_diff";
+            stmt = connection.prepareStatement(queryDays);
+            stmt.setDate(1, new java.sql.Date(modifiedHoliday.getEndDate().getTime()));
+            stmt.setDate(2, new java.sql.Date(modifiedHoliday.getStartDate().getTime()));
+            rs = stmt.executeQuery();
+
+            int newDaysDiff = 0;
+            if (rs.next()) {
+                newDaysDiff = rs.getInt("days_diff");
+            }
+
+            String querySolde = "select solde from employe where id=?";
+            stmt = connection.prepareStatement(querySolde);
+            stmt.setInt(1, employeeId);
+            rs = stmt.executeQuery();
+
+            int solde = 0;
+            if (rs.next()) {
+                solde = rs.getInt("solde");
+            }
+
+            String queryOldDays = "select datediff(endDate, startDate) as old_days_diff from holiday where id=?";
+            stmt = connection.prepareStatement(queryOldDays);
+            stmt.setInt(1, holidayId);
+            rs = stmt.executeQuery();
+
+            int oldDaysDiff = 0;
+            if (rs.next()) {
+                oldDaysDiff = rs.getInt("old_days_diff");
+            }
+
+            int daysDiffAdjustment = newDaysDiff - oldDaysDiff;
+            if (solde + oldDaysDiff >= newDaysDiff) {
+
+            	String updateHolidayQuery = "update holiday set startDate=?, endDate=?, holidayTypeId=(select id from holidaytype where nom=?) where id=?";
+                stmt = connection.prepareStatement(updateHolidayQuery);
+                stmt.setDate(1, new java.sql.Date(modifiedHoliday.getStartDate().getTime()));
+                stmt.setDate(2, new java.sql.Date(modifiedHoliday.getEndDate().getTime()));
+                stmt.setString(3, modifiedHoliday.getHolidayType().name());
+                stmt.setInt(4, holidayId);
+
+                int rowsUpdated = stmt.executeUpdate();
+                if (rowsUpdated > 0) {
+
+                	String updateSoldeQuery = "update employe set solde=solde-? where id=?";
+                    PreparedStatement updateStmt = connection.prepareStatement(updateSoldeQuery);
+                    updateStmt.setInt(1, daysDiffAdjustment);
+                    updateStmt.setInt(2, employeeId);
+                    updateStmt.executeUpdate();
+
+                    System.out.println("Modification réussie :)");
+                } else {
+                    System.out.println("Echec de la modification :(");
+                }
+            } else {
+                System.out.println("Solde insuffisant pour effectuer la modification :(");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public List<String> chargerNomsEmployes() {
+    	
+        List<String> employeeNames = new ArrayList<>();
+        
+        String query = "SELECT CONCAT(nom, ' ', prenom) AS fullName FROM employe";
+
+        try (Connection conn = DBConnection.getConnection();
+        		
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+            	
+                String fullName = rs.getString("fullName");
+                employeeNames.add(fullName);
+                
+            }
+            
+        } catch (SQLException e) {
+        	
+            System.err.println("Erreur lors de la recuperation des noms des employes : " + e.getMessage());
+            
+        }
+
+        return employeeNames;
+    }
+    
+    public int getEmployeeIdByName(String employeeName) {
+    	
+    	String query="SELECT id FROM employe WHERE CONCAT(nom, ' ', prenom)=?";
+    	
+        try (PreparedStatement stmt = DBConnection.getConnection().prepareStatement(query)) {
+            stmt.setString(1, employeeName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recuperation de l'ID employe : " + e.getMessage());
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    
+    public void supprimer(int id) {
+    	
+    	String query="delete from holiday where id=?";
+    	
+        try (PreparedStatement stmt = DBConnection.getConnection().prepareStatement(query)) {
+            stmt.setInt(1, id);
+            int rowsDeleted = stmt.executeUpdate();
+            if (rowsDeleted > 0) {
+                System.out.println("Conge supprime avec succes.");
+            } else {
+                System.out.println("Aucun conge trouve avec cet ID.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la suppression du conge : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

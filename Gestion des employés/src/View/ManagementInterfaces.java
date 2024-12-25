@@ -7,13 +7,13 @@ public class ManagementInterfaces extends JFrame {
     private JTabbedPane tabbedPane = new JTabbedPane();
 
     public ManagementInterfaces(EmployeeView employeeView, HolidayView holidayView) {
-        setTitle("Gestion des Employés et Congés");
+        setTitle("Gestion des Employes et Conges");
         setSize(800, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        tabbedPane.addTab("Gestion des Employés", employeeView.getContentPane());
-        tabbedPane.addTab("Gestion des Congés", holidayView.getContentPane());
+        tabbedPane.addTab("Gestion des Employes", employeeView.getContentPane());
+        tabbedPane.addTab("Gestion des Conges", holidayView.getContentPane());
 
         add(tabbedPane);
 

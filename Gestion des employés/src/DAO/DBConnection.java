@@ -7,9 +7,9 @@ public class DBConnection {
 	private static final String password="";
 	static Connection connection=null;
 	
-	public static Connection getConnection() {
+	public static Connection getConnection() throws SQLException {
 		
-		if(connection==null) {
+		if(connection==null|| connection.isClosed()) {
 			
 			try {
 				
@@ -27,7 +27,7 @@ public class DBConnection {
 
 	}
 	
-	public static void closeConnection() {
+	/*public static void closeConnection() {
 	
 		if(connection!=null) {
 			try {
@@ -40,5 +40,5 @@ public class DBConnection {
 				throw new RuntimeException("Erreur lors de la fermeture de la connexion!");
 			}
 		}
-	}
+	}*/
 }

@@ -4,6 +4,9 @@ import java.awt.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,23 +19,20 @@ public class HolidayView extends JFrame{
 
 	JPanel jp1=new JPanel(), jp2=new JPanel(), jp3=new JPanel(), jp4=new JPanel();
 	
-	private JLabel jlNom=new JLabel("Id de l'employe : "), jlType=new JLabel("Type : "), jlDateDebut=new JLabel("Date de debut : "), jlDateFin=new JLabel("Date de fin : ");
-	//private JComboBox employees=new JComboBox<>();
-	private JTextField jtfEmployeeId=new JTextField();
-    private JComboBox<String> employeeComboBox = new JComboBox<>(); // ComboBox for employee names
+	public JLabel jlNom=new JLabel("Id de l'employe : "), jlType=new JLabel("Type : "), jlDateDebut=new JLabel("Date de debut : "), jlDateFin=new JLabel("Date de fin : ");
+    public JComboBox<String> employeeNameComboBox = new JComboBox<>();
 
-	private JComboBox<HolidayType> holidayType=new JComboBox<>(HolidayType.values());
-	private Calendar calendar=Calendar.getInstance();
+    public JComboBox<HolidayType> holidayType=new JComboBox<>(HolidayType.values());
+    public Calendar calendar=Calendar.getInstance();
 	
-	private JSpinner startDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
-	private JSpinner.DateEditor startDateEditor=new JSpinner.DateEditor(startDateSpinner, "dd/mm/yyyy");//startDateSpinner is going to be added
-	//dateSpinner.setEditor(editor);//should be inside an instructor or methode
+	public JSpinner startDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
+	private JSpinner.DateEditor startDateEditor=new JSpinner.DateEditor(startDateSpinner, "dd/MM/yyyy");//startDateSpinner is going to be added
 	
-	private JSpinner endDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
-	private JSpinner.DateEditor endDateEditor=new JSpinner.DateEditor(endDateSpinner, "dd/mm/yyyy");
+	public JSpinner endDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
+	private JSpinner.DateEditor endDateEditor=new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy");
 	
-	private DefaultTableModel tableModel=new DefaultTableModel(new Object[] [] {}, new String[] {"Id", "Employe", "Date de bebut", "Date de fin", "Type"});
-	private JTable jt=new JTable(tableModel);
+	public DefaultTableModel tableModel=new DefaultTableModel(new Object[] [] {}, new String[] {"Id", "Employe", "Date de bebut", "Date de fin", "Type"});
+	public JTable jt=new JTable(tableModel);
 	
 	public JButton ajouterButton=new JButton("Ajouter"), modifierButton=new JButton("Modifier"), supprimerButton=new JButton("Supprimer"), afficherButton=new JButton("Afficher");
 	
@@ -48,7 +48,7 @@ public class HolidayView extends JFrame{
 		jp1.add(jp2, BorderLayout.NORTH);
 		jp2.setLayout(new GridLayout(4, 2));
 		jp2.add(jlNom);
-		jp2.add(jtfEmployeeId);
+		jp2.add(employeeNameComboBox);
 		jp2.add(jlType);
 		jp2.add(holidayType);
 		startDateSpinner.setEditor(startDateEditor);
@@ -57,8 +57,6 @@ public class HolidayView extends JFrame{
 		jp2.add(startDateSpinner);
 		jp2.add(jlDateFin);
 		jp2.add(endDateSpinner);
-		
-		
 		
 		jp1.add(jp3, BorderLayout.CENTER);
 		jp3.setLayout(new BorderLayout());
@@ -72,31 +70,41 @@ public class HolidayView extends JFrame{
 		jp4.add(supprimerButton);
 		jp4.add(afficherButton);
 		
-		//setVisible(true);
-		
-		
-		
-	}
-	
+		jt.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        if (e.getClickCount() == 2) {
+		            int selectedRow = jt.getSelectedRow();
+		            if (selectedRow != -1) {
+		                try {
+		                    employeeNameComboBox.setSelectedItem(tableModel.getValueAt(selectedRow, 1).toString());
 
-    public void setEmployeeList(List<Employee> employees) {
-        employeeComboBox.removeAllItems();
-        for (Employee emp : employees) {
-            employeeComboBox.addItem(emp.getId() + " - " + emp.getNom() + " " + emp.getPrenom());
-        }
-    }
-	
-	public int getEmployeeId() {
-	    String text = jtfEmployeeId.getText();
-	    if (text.isEmpty()) {
-	        throw new NumberFormatException("Employee ID cannot be empty.");
-	    }
-	    try {
-	        return Integer.parseInt(text);
-	    } catch (NumberFormatException e) {
-	        JOptionPane.showMessageDialog(this, "Please enter a valid Employee ID.", "Invalid input", JOptionPane.ERROR_MESSAGE);
-	        return -1; 
-	    }
+		                    Object startDateObj = tableModel.getValueAt(selectedRow, 2);
+		                    if (startDateObj instanceof Date) {
+		                        startDateSpinner.setValue(startDateObj);
+		                    } else {
+		                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		                        startDateSpinner.setValue(sdf.parse(startDateObj.toString()));
+		                    }
+
+		                    Object endDateObj = tableModel.getValueAt(selectedRow, 3);
+		                    if (endDateObj instanceof Date) {
+		                        endDateSpinner.setValue(endDateObj);
+		                    } else {
+		                        startDateSpinner.setValue(new SimpleDateFormat("dd/MM/yyyy").parse(endDateObj.toString()));
+		                    }
+
+		                    holidayType.setSelectedItem(HolidayType.valueOf(tableModel.getValueAt(selectedRow, 4).toString()));
+		                } catch (Exception ex) {
+		                    afficherMessageErreur("Erreur lors de la récupération des données : " + ex.getMessage());
+		                }
+		            }
+		        }
+		    }
+		});
+
+		//setVisible(true);	
+		
 	}
 	
 	public void afficherHolidays(List<Holiday> holidays) {
@@ -111,7 +119,16 @@ public class HolidayView extends JFrame{
 		    });
 		}
 	}
-
+	
+	public int getId() {
+	    int selectedRow = jt.getSelectedRow();
+	    if (selectedRow != -1) {
+	        Object value = tableModel.getValueAt(selectedRow, 0);
+	        return Integer.parseInt(value.toString());
+	    }
+	    return -1;
+	}
+	
 	public HolidayType getHolidayType() {
 		return (HolidayType) holidayType.getSelectedItem();
 	}

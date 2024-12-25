@@ -6,7 +6,7 @@ import DAO.*;
 public class Main {
 	
 	public static void main(String[] args) {
-		// Create DAO and Models
+
 		EmployeeDAOImpl employeeDAO = new EmployeeDAOImpl();
 		EmployeeModel employeeModel = new EmployeeModel(employeeDAO);
 		

@@ -14,36 +14,24 @@ public class HolidayModel {
         this.dao = dao;
     }
 
-    public boolean ajouterHoliday(int id, Date startDate, Date endDate, HolidayType holidayType, int employeeId) {
+    public boolean ajouterHoliday(String employeeNom, Date startDate, Date endDate, HolidayType holidayType) {
 
-        // Validate that start date is not after the end date
         if (!isValidDateRange(startDate, endDate)) {
-            System.out.println("The start date must be before or equal to the end date.");
+            System.out.println("Date invalide!");
             return false;
         }
 
-        // Calculate the number of holiday days
         long days = calculateHolidayDays(startDate, endDate);
         System.out.println(days + " day(s)");
 
-        // Check if the employee has enough holiday balance (optional)
-        // Uncomment this part if you need to check the balance before allowing the holiday
-        /*
-        if (days > employee.getSolde()) {
-            System.out.println("Not enough holiday balance!");
-            return false;
-        }
-        */
-
-        // Create and save the holiday
-        Holiday newHoliday = new Holiday(id, startDate, endDate, holidayType, employeeId);
+        Holiday newHoliday = new Holiday(employeeNom, startDate, endDate, holidayType);
         dao.ajouter(newHoliday);
 
         return true;
     }
 
-    private boolean isValidDateRange(Date startDate, Date endDate) {
-        return !startDate.after(endDate);  // Ensure startDate is before or equal to endDate
+    public boolean isValidDateRange(Date startDate, Date endDate) {
+        return !startDate.after(endDate); 
     }
 
     private long calculateHolidayDays(Date startDate, Date endDate) {
@@ -55,4 +43,36 @@ public class HolidayModel {
     	
     	return dao.afficher();    	
     }
+    
+	public List<String> chargerNomsEmployes(){
+		
+		return dao.chargerNomsEmployes();
+		
+	}
+	
+	public boolean supprimerHoliday(int id){
+		
+		if(id<=0) {
+			System.out.println("Id invalide!!");
+			return false;
+		}
+		
+		dao.supprimer(id);
+		
+		return true;
+		
+	}
+	
+	public boolean modifierHoliday(int id, String employeeNom, Date startDate, Date endDate, HolidayType holidayType) {
+	    if (id <= 0 || !isValidDateRange(startDate, endDate)) {
+	        System.out.println("Données invalides pour la modification.");
+	        return false;
+	    }
+
+	    Holiday updatedHoliday = new Holiday(id, startDate, endDate, holidayType, employeeNom);
+	    return dao.modifier(updatedHoliday);
+	}
+
+
+	
 }

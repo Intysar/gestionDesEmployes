@@ -60,17 +60,14 @@ public class Employee {
 	}
 
 	public void setId(int int1) {
-		// TODO Auto-generated method stub
 		id=int1;
 	}
 
 	public void setNom(String string) {
-		// TODO Auto-generated method stub
 		nom=string;
 	}
 
 	public void setPrenom(String string) {
-		// TODO Auto-generated method stub
 		prenom=string;
 	}
 }

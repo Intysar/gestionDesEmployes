@@ -13,15 +13,38 @@ public class EmployeeController {
 	private EmployeeView view;
 	private EmployeeModel model;
 	
-	public EmployeeController(EmployeeView view, EmployeeModel model){
-		this.model=model;
-		this.view=view;
-		
-		this.view.ajouterButton.addActionListener(e -> ajouterEmployee());
-		this.view.afficherButton.addActionListener(e -> afficherEmployees());
-		this.view.modifierButton.addActionListener(e -> modifierEmployee());
-		this.view.supprimerButton.addActionListener(e -> supprimerEmployee());
+	public EmployeeController(EmployeeView view, EmployeeModel model) {
+	    this.model = model;
+	    this.view = view;
+	    afficherEmployees();
+	    this.view.ajouterButton.addActionListener(e -> {
+	        ajouterEmployee();  
+	        view.jtfNom.setText(null);
+	        view.jtfPrenom.setText(null);
+	        view.jtfEmail.setText(null);
+	        view.jtfTelephone.setText(null);
+	        view.jtfSalaire.setText(null);
+	        afficherEmployees();    
+	    });
+
+	    this.view.modifierButton.addActionListener(e -> {
+	        modifierEmployee();  
+	        view.jtfNom.setText(null);
+	        view.jtfPrenom.setText(null);
+	        view.jtfEmail.setText(null);
+	        view.jtfTelephone.setText(null);
+	        view.jtfSalaire.setText(null);
+	        afficherEmployees();    
+	    });
+
+	    this.view.supprimerButton.addActionListener(e -> {
+	        supprimerEmployee();    
+	        afficherEmployees();    
+	    });
+
+	    this.view.afficherButton.addActionListener(e -> afficherEmployees());
 	}
+
 	
 	public void ajouterEmployee() {
 		int solde=0;

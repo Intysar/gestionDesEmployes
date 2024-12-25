@@ -14,7 +14,7 @@ public class EmployeeView extends JFrame{
 	
 	private JPanel jp1=new JPanel(), jp2=new JPanel(), jp3=new JPanel(), jp4=new JPanel();
 	private JLabel jlNom=new JLabel("Nom : "), jlPrenom=new JLabel("Prenom : "), jlEmail= new JLabel("Email"), jlTelephone=new JLabel("Téléphone : "), jlSalaire=new JLabel("Salaire : "), jlRole=new JLabel("Role : "), jlPoste=new JLabel("Poste : ");
-	private JTextField jtfNom=new JTextField(), jtfPrenom=new JTextField(), jtfEmail=new JTextField(), jtfTelephone=new JTextField(), jtfSalaire=new JTextField();
+	public JTextField jtfNom=new JTextField(), jtfPrenom=new JTextField(), jtfEmail=new JTextField(), jtfTelephone=new JTextField(), jtfSalaire=new JTextField();
 	private JComboBox<Role> comboboxRole=new JComboBox<>(Role.values());
 	private JComboBox<Poste> comboboxPoste=new JComboBox<>(Poste.values());
 	private DefaultTableModel tableModel=new DefaultTableModel(new Object [] [] {}, new String [] {"Id", "Nom", "Prenom", "Email", "Telephone", "Salaire"});
