@@ -21,6 +21,8 @@ public class Main {
 
 		ManagementInterfaces combinedView = new ManagementInterfaces(employeeView, holidayView);
 		
+		
+		
 		combinedView.setVisible(true);
 	}
 }
