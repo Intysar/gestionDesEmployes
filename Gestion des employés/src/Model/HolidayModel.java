@@ -73,6 +73,10 @@ public class HolidayModel {
 	    return dao.modifier(updatedHoliday);
 	}
 
+	public HolidayDAOImpl getDao() {
+		return dao;
+	}
+
 
 	
 }

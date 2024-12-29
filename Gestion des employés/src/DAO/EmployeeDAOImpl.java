@@ -4,11 +4,16 @@ import Model.Employee;
 import Model.Employee.Poste;
 import Model.Employee.Role;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployeeDAOImpl implements EmployeeDAOI{
+public class EmployeeDAOImpl implements EmployeeDAOI, DataImportExport<Employee>{
 	
 	public List<Employee> getAllEmployees() {
         List<Employee> employees = new ArrayList<>();
@@ -143,5 +148,48 @@ public class EmployeeDAOImpl implements EmployeeDAOI{
 		}
 		
 	}	
+	
+	    public void importData(String filePath) throws IOException {
+	        String query = "insert into employe (nom, prenom, email, telephone, salaire, roleId, posteId) values (?, ?, ?, ?, ?, (select id from role where nom=?), (select id from poste where nom=?))";
+	        try (BufferedReader reader = new BufferedReader(new FileReader(filePath));
+	             PreparedStatement pstmt = DBConnection.getConnection().prepareStatement(query)) {
+
+	            String line;
+	            while ((line = reader.readLine()) != null) {
+	                String[] data = line.split(",");
+	                if (data.length == 6) {
+	                    pstmt.setString(1, data[0].trim());
+	                    pstmt.setString(2, data[1].trim());
+	                    pstmt.setString(3, data[2].trim());
+	                    pstmt.setString(4, data[3].trim());
+	                    pstmt.setString(5, data[4].trim());
+	                    pstmt.setDouble(6, Double.parseDouble(data[5].trim()));
+	                    pstmt.addBatch();
+	                }
+	            }
+	            pstmt.executeBatch();
+	            System.out.println("Employees imported successfully!");
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    public void exportData(String fileName, List<Employee> employees) throws IOException {
+	        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+	            writer.write("Id,Nom,Prenom,Email,Telephone,Role,salaire,solde");
+	            writer.newLine();
+	            for (Employee employee : employees) {
+	                writer.write(String.format("%s,%s,%s,%s,%s,%.2f",
+	                        employee.getNom(),
+	                        employee.getPrenom(),
+	                        employee.getEmail(),
+	                        employee.getTelephone(),
+	                        employee.getRole(),
+	                        employee.getSalaire()));
+	                writer.newLine();
+	            }
+	            System.out.println("Employees exported successfully!");
+	        }
+	    }
 	
 }

@@ -1,5 +1,10 @@
 package DAO;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -116,7 +121,7 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
     		    Date startDate = rs.getDate("start_date");
     		    Date endDate = rs.getDate("end_date");
 
-    		    Holiday newHoliday = new Holiday(holidayId, startDate, endDate, HolidayType.valueOf(holidayTypeNom), employeeId, nomEmployee);
+    		    Holiday newHoliday = new Holiday(holidayId, startDate, endDate, HolidayType.valueOf(holidayTypeNom), employeeId, nomEmployee, solde);
     		    holidays.add(newHoliday);
     		}
 
@@ -282,4 +287,46 @@ public class HolidayDAOImpl implements GenericDAOI<Holiday> {
             e.printStackTrace();
         }
     }
+    
+    public void exporterHolidays(String filePath) {
+        List<Holiday> holidays = afficher(); 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write("Id,Nom Employe,Date Debut,Date Fin,Type,Solde\n");
+            for (Holiday holiday : holidays) {
+                writer.write(String.format("%d,%s,%s,%s,%s,%d\n",
+                    holiday.getId(),
+                    holiday.getEmployeeNom(),
+                    new java.text.SimpleDateFormat("dd/MM/yyyy").format(holiday.getStartDate()),
+                    new java.text.SimpleDateFormat("dd/MM/yyyy").format(holiday.getEndDate()),
+                    holiday.getHolidayType(),
+                    holiday.getSolde()
+                ));
+            }
+            System.out.println("Exportation réussie !");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de l'exportation !");
+        }
+    }
+
+    public void importerHolidays(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line = reader.readLine(); // Skip header
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 6) {
+                    String employeeNom = parts[1];
+                    Date startDate = new java.text.SimpleDateFormat("dd/MM/yyyy").parse(parts[2]);
+                    Date endDate = new java.text.SimpleDateFormat("dd/MM/yyyy").parse(parts[3]);
+                    Holiday.HolidayType holidayType = Holiday.HolidayType.valueOf(parts[4]);
+                    ajouter(new Holiday(employeeNom, startDate, endDate, holidayType));
+                }
+            }
+            System.out.println("Importation réussie !");
+        } catch (IOException | java.text.ParseException e) {
+            e.printStackTrace();
+            System.out.println("Erreur lors de l'importation !");
+        }
+    }
+    
 }

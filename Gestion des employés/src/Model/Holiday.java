@@ -10,6 +10,7 @@ public class Holiday {
 	private int employeeId;
 	private String employeeNom;
 	private String selectedItem;
+	private int solde; 
 	
 	public Holiday(int id, Date startDate, Date endDate, HolidayType holidayType, int employeeId){
 		this.id=id;
@@ -44,6 +45,15 @@ public class Holiday {
     }
 
 
+	public Holiday(int holidayId, Date startDate2, Date endDate2, HolidayType valueOf, int employeeId2, String nomEmployee, int solde) {
+        this.id = holidayId;
+        this.startDate = startDate2;
+        this.endDate = endDate2;
+        this.holidayType = valueOf;
+        this.employeeNom = nomEmployee;	
+        this.solde=solde;
+    }
+
 	public int getId() {return id;}
 	public Date getStartDate() {return startDate;}
 	public Date getEndDate() {return endDate;}
@@ -53,6 +63,9 @@ public class Holiday {
 	public String getSelectedItem() {
 		return selectedItem;
 	}//i'll remove this later
+	public int getSolde() {
+		return solde;
+	}
 	
 	
 	public enum HolidayType {

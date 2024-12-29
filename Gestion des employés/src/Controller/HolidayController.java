@@ -3,6 +3,9 @@ package Controller;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import Model.HolidayModel;
 import View.HolidayView;
 import Model.Holiday;
@@ -35,6 +38,10 @@ public class HolidayController {
 	        modifierHoliday();
 	        afficherHolidays();
 	    });
+	    
+	    view.exporterButton.addActionListener(e -> exporterHolidays());
+	    view.importerButton.addActionListener(e -> importerHolidays());
+
 
 	}
 	
@@ -121,6 +128,27 @@ public class HolidayController {
     		}else {
     			view.afficherMessageErreur("Le conges n'a pas ete supprime :(");
     		}
+    }
+
+    public void exporterHolidays() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showSaveDialog(view);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            model.getDao().exporterHolidays(filePath);
+            view.afficherMessageSucces("Les congés ont été exportés avec succès !");
+        }
+    }
+
+    public void importerHolidays() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showOpenDialog(view);
+        if (option == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            model.getDao().importerHolidays(filePath);
+            afficherHolidays(); 
+            view.afficherMessageSucces("Les congés ont été importés avec succès !");
+        }
     }
 
 }

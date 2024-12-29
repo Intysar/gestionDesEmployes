@@ -24,14 +24,15 @@ public class HolidayView extends JFrame{
 
     public JComboBox<HolidayType> holidayType=new JComboBox<>(HolidayType.values());
     public Calendar calendar=Calendar.getInstance();
-	
+    public JButton importerButton = new JButton("Importer");
+    public JButton exporterButton = new JButton("Exporter");
 	public JSpinner startDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
 	private JSpinner.DateEditor startDateEditor=new JSpinner.DateEditor(startDateSpinner, "dd/MM/yyyy");//startDateSpinner is going to be added
 	
 	public JSpinner endDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
 	private JSpinner.DateEditor endDateEditor=new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy");
 	
-	public DefaultTableModel tableModel=new DefaultTableModel(new Object[] [] {}, new String[] {"Id", "Employe", "Date de bebut", "Date de fin", "Type"});
+	public DefaultTableModel tableModel=new DefaultTableModel(new Object[] [] {}, new String[] {"Id", "Employe", "Date de bebut", "Date de fin", "Type", "solde"});
 	public JTable jt=new JTable(tableModel);
 	
 	public JButton ajouterButton=new JButton("Ajouter"), modifierButton=new JButton("Modifier"), supprimerButton=new JButton("Supprimer"), afficherButton=new JButton("Afficher");
@@ -69,6 +70,8 @@ public class HolidayView extends JFrame{
 		jp4.add(modifierButton);
 		jp4.add(supprimerButton);
 		jp4.add(afficherButton);
+		jp4.add(importerButton);
+		jp4.add(exporterButton);
 		
 		jt.addMouseListener(new MouseAdapter() {
 		    @Override
@@ -115,7 +118,8 @@ public class HolidayView extends JFrame{
 		        elm.getEmployeeNom(),
 		        elm.getStartDate(),
 		        elm.getEndDate(),
-		        elm.getHolidayType().name()
+		        elm.getHolidayType().name(),
+		        elm.getSolde()
 		    });
 		}
 	}
