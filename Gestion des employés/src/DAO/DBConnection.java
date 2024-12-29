@@ -17,6 +17,7 @@ public class DBConnection {
 				connection=DriverManager.getConnection(url, user, password);
                 System.out.println("Connexion reussie !");
 
+                
 			}catch(ClassNotFoundException |SQLException e) {
 				e.printStackTrace();
                 throw new RuntimeException("Erreur lors de la connexion a la base de donnees !");

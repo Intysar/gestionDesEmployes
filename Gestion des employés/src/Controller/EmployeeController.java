@@ -18,6 +18,7 @@ public class EmployeeController {
         this.view = view;
         afficherEmployees();
 
+       
         this.view.ajouterButton.addActionListener(e -> {
             ajouterEmployee();
             clearFields();

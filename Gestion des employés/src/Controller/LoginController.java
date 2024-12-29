@@ -14,10 +14,12 @@ public class LoginController {
         this.model = model;
         this.view = view;
 
+        
         this.view.submitButton.addActionListener(e -> {
             login();
         });
     }
+    
 
     public void login() {
         String email = view.getEmail();

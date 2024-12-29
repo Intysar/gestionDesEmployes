@@ -26,6 +26,7 @@ public class EmployeeView extends JFrame {
                    supprimerButton = new JButton("Supprimer"), afficherButton = new JButton("Afficher"),
                    importButton = new JButton("Importer"), exportButton = new JButton("Exporter");
 
+    
     public EmployeeView() {
         setTitle("Gestion des employés");
         setSize(600, 400);

@@ -10,3 +10,4 @@ public interface GenericDAOI<T> {
 	//public void supprimer(int id):
 	
 }
+

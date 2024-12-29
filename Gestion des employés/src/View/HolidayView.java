@@ -32,6 +32,7 @@ public class HolidayView extends JFrame{
 	public JSpinner endDateSpinner=new JSpinner(new SpinnerDateModel(calendar.getTime(), null, null, Calendar.DAY_OF_MONTH));
 	private JSpinner.DateEditor endDateEditor=new JSpinner.DateEditor(endDateSpinner, "dd/MM/yyyy");
 	
+	
 	public DefaultTableModel tableModel=new DefaultTableModel(new Object[] [] {}, new String[] {"Id", "Employe", "Date de bebut", "Date de fin", "Type", "solde"});
 	public JTable jt=new JTable(tableModel);
 	

@@ -13,3 +13,4 @@ public class MainLogin {
         new LoginController(view, model);
     }
 }
+

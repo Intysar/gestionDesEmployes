@@ -20,6 +20,7 @@ public class Login extends JFrame {
 
         public JButton submitButton = new JButton("Submit");
         
+        
     public Login() {
         setTitle("Login Page");
         setSize(400, 250);

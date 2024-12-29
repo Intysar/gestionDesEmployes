@@ -27,6 +27,7 @@ public class EmployeeModel {
             System.out.println("Erreur : numero de telephone invalide!");
             return false;
         }
+        
 
         if (salaire <= 0) {
             System.out.println("Erreur : salaire invalide!");

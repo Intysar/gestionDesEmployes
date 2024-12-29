@@ -16,6 +16,7 @@ public class HolidayController {
 	private HolidayView view;
 	private HolidayModel model;
 	
+	
 	public HolidayController(HolidayView view, HolidayModel model){
 		this.model=model;
 		this.view=view;

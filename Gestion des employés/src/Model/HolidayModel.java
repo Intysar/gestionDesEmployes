@@ -27,6 +27,7 @@ public class HolidayModel {
         Holiday newHoliday = new Holiday(employeeNom, startDate, endDate, holidayType);
         dao.ajouter(newHoliday);
 
+        
         return true;
     }
 
